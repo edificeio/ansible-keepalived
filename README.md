@@ -95,7 +95,7 @@ vrrp_instance:
 ```
 And finally, run the playbook:
 ```bash
-ansible-playbook -i inventories/hosts lb.yml
+$ ansible-playbook -i inventories/hosts lb.yml
 ```
 
 
