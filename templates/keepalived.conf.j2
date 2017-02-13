@@ -1,0 +1,39 @@
+vrrp_script check_script {
+	script "{{ vrrp_script.script }}"
+{% if vrrp_script.options is defined %}
+{% for option in vrrp_script.options %}
+	{{ option }}
+{% endfor %}
+{% endif %}
+}
+
+vrrp_instance {{ vrrp_instance.name }} {
+	interface {{ vrrp_instance.interface }}
+	state {{ vrrp_instance.state }}
+	priority {{ vrrp_instance.priority }}
+	virtual_router_id {{ vrrp_instance.virtual_router_id }}
+	unicast_src_ip {{ vrrp_instance.unicast_src_ip }}
+
+	unicast_peer {
+{% for address in vrrp_instance.unicast_peer %}
+		{{ address }}
+{% endfor %}
+	}
+
+	track_script {
+		check_script
+	}
+
+	virtual_ipaddress {
+{% for address in vrrp_instance.virtual_ipaddress %}
+		{{address}}
+{% endfor %}
+	}	
+{% if vrrp_instance.virtual_routes is defined %}
+	virtual_routes {
+{% for route in vrrp_instance.virtual_routes %}
+		{{ route }}
+{% endfor %}
+	}
+{% endif %}
+}

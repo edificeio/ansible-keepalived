@@ -1,0 +1,16 @@
+---
+- name: Install keepalived
+  package: name=keepalived state=latest
+  tags: keepalived
+  notify: restart keepalived
+
+- name: Pushing /etc/keepalived/keepalived.conf
+  template: src=keepalived.conf.j2 dest=/etc/keepalived/keepalived.conf
+  tags: keepalived
+  notify: 
+    - restart keepalived
+    - restart networking
+
+- name: Start keepalived
+  service: name=keepalived state=started
+  tags: keepalived
