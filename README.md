@@ -8,10 +8,36 @@ Requirements
 
 Tested on Ubuntu 14.04 and Debian Jessie
 
-Role Variables
+Example usage
 --------------
-Example MASTER server configuration:
+
+
+```
+├── inventories
+│   ├── group_vars
+│   │   ├── lb-backup
+│   │   └── lb-master
+│   └── hosts
+└── lb.yml
+```
+
+`inventories/hosts`:
+```
+[lb-master]
+ent-core-2
+
+[lb-backup]
+ent-core-3
+
+[lb:children]
+lb-master
+lb-backup
+```
+
+`inventories/group_vars/lb-master`:
 ```yaml
+---
+# lb-master
 vrrp_script:
   script: "pidof nginx" # service check script, mandatory
   options: # optional
@@ -32,8 +58,10 @@ vrrp_instance:
   notify: '/opt/notify.sh' # script to be run on state change. the script is passer 3 parametrs (TYPE, INSTANCE, STATE). optional 
 ```
 
-Example BACKUP server configuration:
+`inventories/group_vars/lb-backup`:
 ```yaml
+---
+# lb-backup
 vrrp_script:
   script: "pidof nginx"
   options:
@@ -55,15 +83,7 @@ vrrp_instance:
 
 ```
 
-Dependencies
-------------
-
-None
-
-Example Playbook
-----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+`inventories/lb.yml`:
 ```yaml
 ---
 - name: 'keepalived test'
@@ -73,6 +93,9 @@ Including an example of how to use your role (for instance, with variables passe
   roles:
     - role: ansible-keepalived
 ```
+
+
+
 License
 -------
 
