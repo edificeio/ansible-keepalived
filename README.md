@@ -6,11 +6,10 @@ Ansible role for installing and configuring keepalived (vrrp) on a cluster
 Requirements
 ------------
 
-Tested on Ubuntu 14.04 and Debian Jessie
+Tested on Ubuntu 14.04 and Debian 8.
 
 Example usage
 --------------
-
 
 ```
 ├── inventories
@@ -21,7 +20,7 @@ Example usage
 └── lb.yml
 ```
 
-`inventories/hosts`:
+**Hosts file:**
 ```
 [lb-master]
 ent-core-2
@@ -34,7 +33,7 @@ lb-master
 lb-backup
 ```
 
-`inventories/group_vars/lb-master`:
+**Master server group vars:**
 ```yaml
 ---
 # lb-master
@@ -58,7 +57,7 @@ vrrp_instance:
   notify: '/opt/notify.sh' # script to be run on state change. the script is passer 3 parametrs (TYPE, INSTANCE, STATE). optional 
 ```
 
-`inventories/group_vars/lb-backup`:
+**Backup server group vars:**
 ```yaml
 ---
 # lb-backup
@@ -83,7 +82,7 @@ vrrp_instance:
 
 ```
 
-`inventories/lb.yml`:
+**Playbook:**
 ```yaml
 ---
 - name: 'keepalived test'
@@ -93,7 +92,8 @@ vrrp_instance:
   roles:
     - role: ansible-keepalived
 ```
-And finally, run the playbook:
+
+**And finally, run the playbook:**
 ```bash
 $ ansible-playbook -i inventories/hosts lb.yml
 ```
