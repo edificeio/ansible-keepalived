@@ -1,38 +1,79 @@
-Role Name
+ansible-keepalived
 =========
 
-A brief description of the role goes here.
+Ansible role for installing and configuring keepalived (vrrp) on a cluster
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Tested on Ubuntu 14.04 and Debian Jessie
 
 Role Variables
 --------------
+Example MASTER server configuration:
+```yaml
+vrrp_script:
+  script: "pidof nginx" # service check script, mandatory
+  options: # optional
+    - 'interval 2'
+    - 'fall 2'
+    - 'rise 2'
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+vrrp_instance:
+  name: LB_77 # vrrp cluster name, mandatory
+  interface: eth0 # vrrp cluster communication iface, mandatory
+  state: MASTER # init
+  priority: 200 # priority, set 50 above other members to be elected master. mandatory
+  virtual_router_id: 77 # [1 - 255] vrrp id. mandatory
+  unicast_src_ip: 192.168.56.78 # src ip address for vrrp communication, mandatory
+  unicast_peer: ['192.168.56.79'] # ip address of vrrp cluster peers. mandatory
+  virtual_ipaddress: ['10.0.0.1/16 dev eth0', '192.168.56.254/24 dev eth1'] # virtual ip addresses, mandatory
+  virtual_routes: ['0.0.0.0/0 via 10.0.255.254 dev eth0'] # virtual routes, optional
+  notify: '/opt/notify.sh' # script to be run on state change. the script is passer 3 parametrs (TYPE, INSTANCE, STATE). optional 
+```
+
+Example BACKUP server configuration:
+```yaml
+vrrp_script:
+  script: "pidof nginx"
+  options:
+    - 'interval 2'
+    - 'fall 2'
+    - 'rise 2'
+
+vrrp_instance:
+  name: LB_77
+  interface: eth0
+  state: BACKUP
+  priority: 100
+  virtual_router_id: 77
+  unicast_src_ip: 192.168.56.79
+  unicast_peer: ['192.168.56.78']
+  virtual_ipaddress: ['10.0.0.1/16 dev eth0', '192.168.56.254/24 dev eth1']
+  virtual_routes: ['0.0.0.0/0 via 10.0.255.254 dev eth0']
+  notify: '/opt/notify.sh'
+
+```
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 ----------------
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+```yaml
+---
+- name: 'keepalived test'
+  hosts: lb
+  remote_user: root
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
-
+  roles:
+    - role: ansible-keepalived
+```
 License
 -------
 
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+MIT
