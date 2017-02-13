@@ -93,7 +93,10 @@ vrrp_instance:
   roles:
     - role: ansible-keepalived
 ```
-
+And finally, run the playbook:
+```bash
+ansible-playbook -i inventories/hosts lb.yml
+```
 
 
 License
