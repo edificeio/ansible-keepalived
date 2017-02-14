@@ -36,4 +36,8 @@ vrrp_instance {{ vrrp_instance.name }} {
 {% endfor %}
 	}
 {% endif %}
+
+{% if vrrp_instance.notify is defined %}
+	notify {{ vrrp_instance.notify }}
+{% endif %}
 }
